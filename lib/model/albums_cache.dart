@@ -31,12 +31,7 @@ class AlbumsCache{
       (value){
         String jsonData = jsonEncode(
           albums.map((album){
-            return {
-              "id": album.id,
-              "title": album.name,
-              "userId": album.userId,
-              "favoriteStatus": album.favorite,
-            };
+            return album.toJson();
           }).toList()
         );
         value.setString(_albumsCacheListKey, jsonData);

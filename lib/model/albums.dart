@@ -18,6 +18,15 @@ class Album{
       favorite: json['favoriteStatus'] as bool?,
     );
   }
+
+  Map<String, dynamic >toJson(){
+    return {
+      "id": id,
+      "title": name,
+      "userId": userId,
+      "favoriteStatus": favorite,
+    };
+  }
 }
 
 class AlbumsResponse{
