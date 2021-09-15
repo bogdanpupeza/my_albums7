@@ -39,6 +39,7 @@ class AlbumsVM{
          );
       }
     );
+    
     output = Output(combinedStream);
   }
 }
