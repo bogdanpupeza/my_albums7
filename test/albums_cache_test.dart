@@ -8,6 +8,9 @@ import 'albums_cache_test.mocks.dart';
 
 @GenerateMocks([SharedPreferences])
 void main(){
+  SharedPreferences.setMockInitialValues({"key": 3});
+  AlbumsCache albumsCache = AlbumsCache(SharedPreferences.getInstance());
+  SharedPreferences.setMockInitialValues({});
   List<Album> albums = [];
   for(int i = 0; i < 100; ++i){
     albums.add(
@@ -19,12 +22,12 @@ void main(){
       )
     );
   }
-  // test("Test if we get an error", (){
+  test("Test if we get an error", (){
     
-  //   expect(
-  //     albumsCache.getAlbums(), 
-  //     emits(albums),
-  //   );
+    expect(
+      albumsCache.getAlbums(), 
+      emits(albums),
+    );
     
-  // });
+  });
 }

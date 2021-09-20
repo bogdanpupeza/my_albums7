@@ -6,14 +6,14 @@ class AlbumsCache{
   final String _albumsCacheListKey = "albumsList";
   final String _dateKey = "dateKey";
   final String _favoritesKey = "favorites";
-
-
+  final Future<SharedPreferences> sharedPreferences;
+  AlbumsCache(this.sharedPreferences);
   Stream<List<Album>> getAlbums (){
     List<Album> albumsList = [];
     List<dynamic> responseJson;
     String response;
     return Stream.fromFuture(
-      SharedPreferences.getInstance().then(
+      sharedPreferences.then(
         (pref){
           response = pref.getString(_albumsCacheListKey) as String;
           responseJson = jsonDecode( response);
@@ -27,7 +27,7 @@ class AlbumsCache{
   }
   
   void setAlbums(List<Album> albums){
-    SharedPreferences.getInstance().then(
+    sharedPreferences.then(
       (pref){
         String jsonData = jsonEncode(
           albums.map((album){
@@ -40,7 +40,7 @@ class AlbumsCache{
   }
 
   void setDate(DateTime dateTime){
-    SharedPreferences.getInstance().then(
+    sharedPreferences.then(
       (pref){
         String dateString = dateTime.toIso8601String();
         pref.setString(_dateKey, dateString);
@@ -52,7 +52,7 @@ class AlbumsCache{
     DateTime? dateTime;
     String dateString;
     return Stream.fromFuture(
-      SharedPreferences.getInstance().then(
+      sharedPreferences.then(
         (pref){
           dateString = pref.getString(_dateKey) as String;
           dateTime = DateTime.parse(dateString);
@@ -68,7 +68,7 @@ class AlbumsCache{
     List<int> favorites = [];
     List<String> response;
     return Stream.fromFuture(
-      SharedPreferences.getInstance().then(
+      sharedPreferences.then(
         (pref){
           response = pref.getStringList(_favoritesKey) as List<String>;
           favorites = response.map((idString){
@@ -83,7 +83,7 @@ class AlbumsCache{
   }
 
   void setFavorites(List<int> favorites){
-    SharedPreferences.getInstance().then(
+    sharedPreferences.then(
       (pref){
         List<String> ids =
           favorites.map((albumId){
