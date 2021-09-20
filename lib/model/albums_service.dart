@@ -24,8 +24,8 @@ class AlbumsService {
         }
       ).onError((error, stackTrace){
         if(error is SocketException)
-          throw SocketException("No internet connection");
-        throw stackTrace;
+          throw SocketException("");
+        throw Error();
       })
     );
   }
