@@ -11,59 +11,51 @@ class AlbumsCache{
   Stream<List<Album>> getAlbums (){
     List<Album> albumsList = [];
     List<dynamic> responseJson;
-    var response;
+    String response;
     return Stream.fromFuture(
       SharedPreferences.getInstance().then(
-        (value){
-          response = value.getString(_albumsCacheListKey) as String;
+        (pref){
+          response = pref.getString(_albumsCacheListKey) as String;
           responseJson = jsonDecode( response);
           albumsList = responseJson.map((element) => Album.fromJson(element)).toList();
           return albumsList;
         }
       ).onError((error, stackTrace){
-        return [];
+        throw Error(); 
       })
     );
   }
   
   void setAlbums(List<Album> albums){
     SharedPreferences.getInstance().then(
-      (value){
+      (pref){
         String jsonData = jsonEncode(
           albums.map((album){
             return album.toJson();
           }).toList()
         );
-        value.setString(_albumsCacheListKey, jsonData);
-        return value;
+        pref.setString(_albumsCacheListKey, jsonData);
       }
     );
   }
 
   void setDate(DateTime dateTime){
     SharedPreferences.getInstance().then(
-      (value){
-        String jsonData = jsonEncode(
-          dateTime.toIso8601String()
-        );
-        value.setString(_dateKey, jsonData);
-        return value;
+      (pref){
+        String dateString = dateTime.toIso8601String();
+        pref.setString(_dateKey, dateString);
       }
     );
   }
 
   Stream<DateTime?> getLastDate (){
     DateTime? dateTime;
-    List<dynamic> responseJson;
-    var response;
+    String dateString;
     return Stream.fromFuture(
       SharedPreferences.getInstance().then(
-        (value){
-          response = value.getString(_dateKey) as String;
-          responseJson = jsonDecode(response);
-          dateTime = responseJson.map((e){
-            return DateTime.parse(e);
-          }).first;
+        (pref){
+          dateString = pref.getString(_dateKey) as String;
+          dateTime = DateTime.parse(dateString);
           return dateTime;
         }
       ).onError((error, stackTrace){
@@ -74,15 +66,13 @@ class AlbumsCache{
 
   Stream<List<int>> getFavorites(){
     List<int> favorites = [];
-    List<dynamic> responseJson;
-    var response;
+    List<String> response;
     return Stream.fromFuture(
       SharedPreferences.getInstance().then(
-        (value){
-          response = value.getString(_favoritesKey) as String;
-          responseJson = jsonDecode( response);
-          responseJson.map((element){
-            favorites.add(element["id"]);
+        (pref){
+          response = pref.getStringList(_favoritesKey) as List<String>;
+          favorites = response.map((idString){
+            return int.parse(idString);
           }).toList();
           return favorites;
         }
@@ -93,20 +83,16 @@ class AlbumsCache{
   }
 
   void setFavorites(List<int> favorites){
-
     SharedPreferences.getInstance().then(
-      (value){
-        String jsonData = jsonEncode(
+      (pref){
+        List<String> ids =
           favorites.map((albumId){
-            return {
-              "id": albumId,
-            };
-          }).toList()
-        );
-        value.setString(_favoritesKey, jsonData);
-        return value;
+            return albumId.toString();
+          }).toList();
+        pref.setStringList(_favoritesKey, ids);
       }
     );
   }
 
+  
 }

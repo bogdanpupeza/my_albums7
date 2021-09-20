@@ -4,16 +4,19 @@ import '../model/albums.dart';
 import '../model/albums_repository.dart';
 import '../model/albums_service.dart';
 
-
 class AlbumsVM{
   final albumsRepository = AlbumsRepository(AlbumsService(),AlbumsCache());
   final Input input;
   late Output output;
-
+  
   AlbumsVM(this.input){
+    List<int> _firstFavorites = [];
     Stream<AlbumsResponse> albumsData = input.loadData.flatMap(
       (event){
-        return albumsRepository.getAlbums();
+        return albumsRepository.getFavorites().flatMap((favorites){
+          _firstFavorites.addAll(favorites);
+          return albumsRepository.getAlbums();
+        });
       }
     );
     
@@ -22,23 +25,18 @@ class AlbumsVM{
     });
 
     Stream<AlbumsResponse> combinedStream =
-    Rx.combineLatest2(albumsData, favoritesStream.startWith([]), 
+    Rx.combineLatest2(albumsData, favoritesStream.startWith(_firstFavorites), 
       (AlbumsResponse albumsResponse, List<int> favorites){
-        return AlbumsResponse(
-          albums: albumsResponse.albums.map((album){
-            Album albumFav = Album(
-              id: album.id,
-              name: album.name,
-              userId: album.userId,
-              favorite: favorites.any((element) => element == album.id),
-            );
-            return albumFav;
-          }).toList(), 
-          lastUpdate: albumsResponse.lastUpdate
-         );
+        albumsResponse.albums.forEach((album){
+          if (favorites.any((favAlbum) => favAlbum == album.id)){
+            album.favorite = true;
+          } else {
+            album.favorite = false;
+          }
+        });
+        return albumsResponse;
       }
     );
-    
     output = Output(combinedStream);
   }
 }

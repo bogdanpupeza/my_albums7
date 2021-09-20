@@ -1,7 +1,7 @@
 class Album{
   final int? userId;
   final String? name;
-  final int? id;
+  final int id;
   bool? favorite;
   Album({
     required this.userId,
@@ -12,7 +12,7 @@ class Album{
   
   factory Album.fromJson(Map<String, dynamic> json) {
     return Album(
-      id: json['id'] as int?,
+      id: json['id'] as int,
       name: json['title'] as String?,
       userId: json['userId'] as int?,
       favorite: json['favoriteStatus'] as bool?,
@@ -25,6 +25,7 @@ class Album{
       "title": name,
       "userId": userId,
       "favoriteStatus": favorite,
+      
     };
   }
 }
