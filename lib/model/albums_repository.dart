@@ -16,8 +16,6 @@ class AlbumsRepository{
     this.albumsCache,
   );
 
-  DateTime? _lastUpdate;
-
   Stream<List<int>> toggleAlbum(int id){
     Stream<List<int>> favoritesStream = albumsCache.getFavorites();
     Stream<List<int>> actualFavorites = favoritesStream.map((favorites){
@@ -37,12 +35,13 @@ class AlbumsRepository{
   }
 
   Stream<AlbumsResponse> getAlbums(){
-    _lastUpdate = DateTime.now();
+    DateTime? _lastUpdate;
     Stream<DateTime?> dateStream = albumsCache.getLastDate();
     Stream<List<Album>> albumsStream = 
     albumsService.getAlbums().map((albumsList){
       albumsCache.setAlbums(albumsList);
-      albumsCache.setDate(DateTime.now());
+      _lastUpdate = DateTime.now();
+      albumsCache.setDate(_lastUpdate!);
       return albumsList;
     }).onErrorResume(
       (error, stackTrace){
