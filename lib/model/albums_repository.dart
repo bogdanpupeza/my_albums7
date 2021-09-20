@@ -56,8 +56,8 @@ class AlbumsRepository{
       }
     );
     
-    return albumsStream.map((albumsList){
-      return AlbumsResponse(albums: albumsList, lastUpdate: _lastUpdate);
+    return albumsStream.flatMap((albumsList){
+      return Stream.value(AlbumsResponse(albums: albumsList, lastUpdate: _lastUpdate));
     });
   }
 }

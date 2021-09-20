@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:my_albums6/model/albums.dart';
@@ -30,12 +28,8 @@ void main() {
   }
 
   DateTime date = DateTime.now();
-  AlbumsResponse albumsResponse = AlbumsResponse(
-    albums: albums,
-    lastUpdate: date,
-  );
 
-  group("Tests for getting albums ", () {
+  group("Test for getting albums ", () {
     test("from Service", () {
       when(albumsCache.getLastDate()).thenAnswer((_) {
         return Stream.value(date);
@@ -44,12 +38,17 @@ void main() {
         return Stream.value(albums);
       });
       expect(
-          albumsRepository.getAlbums().map((albumsResponse2) {
-            return albumsResponse2.albums;
-          }),
-          emits(albumsResponse.albums));
-      albumsCache.setAlbums(albums);
-      albumsCache.setDate(date);
+        albumsRepository.getAlbums(),
+        emits(isA<AlbumsResponse>().having((albumResponse){
+          return albumResponse.albums;
+        }, "Albums", albums)),
+      );
+      expect(
+        albumsRepository.getAlbums(),
+        emits(isA<AlbumsResponse>().having((albumResponse){
+          return albumResponse.lastUpdate;
+        }, "Date", date)),
+      );
     });
 
     test("from Cache", () {
@@ -62,10 +61,16 @@ void main() {
       when(albumsService.getAlbums())
           .thenAnswer((_) => Stream.error(SocketException("")));
       expect(
-        albumsRepository.getAlbums().map((albumsResponse2) {
-          return albumsResponse2.albums;
-        }),
-        emits(albumsResponse.albums),
+        albumsRepository.getAlbums(),
+        emits(isA<AlbumsResponse>().having((albumResponse){
+          return albumResponse.albums;
+        }, "Albums", albums)),
+      );
+       expect(
+        albumsRepository.getAlbums(),
+        emits(isA<AlbumsResponse>().having((albumResponse){
+          return albumResponse.lastUpdate;
+        }, "Date", date)),
       );
     });
   });
