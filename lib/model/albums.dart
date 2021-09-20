@@ -19,13 +19,12 @@ class Album{
     );
   }
 
-  Map<String, dynamic >toJson(){
+  Map<String, dynamic> toJson(){
     return {
       "id": id,
       "title": name,
       "userId": userId,
       "favoriteStatus": favorite,
-      
     };
   }
 }
