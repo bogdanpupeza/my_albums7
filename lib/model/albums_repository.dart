@@ -38,8 +38,7 @@ class AlbumsRepository{
 
   Stream<AlbumsResponse> getAlbums(){
     _lastUpdate = DateTime.now();
-    Stream<DateTime?> dateStream = albumsCache.getLastDate();
-    Stream<List<Album>> albumsStream = 
+    return
     albumsService.getAlbums().map((albumsList){
       albumsCache.setAlbums(albumsList);
       albumsCache.setDate(DateTime.now());
@@ -47,16 +46,14 @@ class AlbumsRepository{
     }).onErrorResume(
       (error, stackTrace){
         if(error is SocketException){
-          return dateStream.flatMap((date){
+          return albumsCache.getLastDate().flatMap((date){
             _lastUpdate = date;
             return albumsCache.getAlbums();
           });
         }
         throw error;
       }
-    );
-    
-    return albumsStream.flatMap((albumsList){
+    ).flatMap((albumsList){
       return Stream.value(AlbumsResponse(albums: albumsList, lastUpdate: _lastUpdate));
     });
   }
