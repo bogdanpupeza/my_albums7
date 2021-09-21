@@ -6,6 +6,8 @@ import '../model/albums.dart';
 
 class AlbumsService {
   final String _url = "https://jsonplaceholder.typicode.com/albums";
+  final http.Client client;
+  AlbumsService(this.client);
   
   Stream<List<Album>> getAlbums () {
     

@@ -16,12 +16,12 @@ void main() {
   final String _url = "https://jsonplaceholder.typicode.com/albums";
   AlbumsService albumsService = AlbumsService();
   List<Album> albums = [];
-  for (int i = 0; i < 100; ++i) {
+  for (int i = 1; i <= 100; ++i) {
     albums.add(Album(
       userId: i % 20,
       name: "album $i",
       id: i,
-      favorite: i % 2 == 0,
+      favorite: null,
     ));
   }
   String jsonAlbums = json.encode(
@@ -29,12 +29,14 @@ void main() {
       return album.toJson();
     }
   ).toList());
-  Response response = Response(jsonAlbums,200);
-  test("Test if we get albums", () {
+  Response response = http.Response(jsonAlbums,200);
+  test("Test for getting albums", () {
     when(client.get(Uri.parse(_url))).thenAnswer((_)=>Future.value(response));
     expect(
       albumsService.getAlbums(),
-      emits(albums),
+      emits(isA<List<Album>>().having((p0){
+        return p0.last.userId;
+      }, "description", albums.last.userId)),
     );
   });
 }
