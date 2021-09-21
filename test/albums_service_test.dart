@@ -1,7 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:http/http.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:my_albums6/model/albums.dart';
@@ -14,7 +14,7 @@ import 'albums_service_test.mocks.dart';
 void main() {
   final client = MockClient();
   final String _url = "https://jsonplaceholder.typicode.com/albums";
-  AlbumsService albumsService = AlbumsService();
+  AlbumsService albumsService = AlbumsService(client);
   List<Album> albums = [];
   for (int i = 1; i <= 100; ++i) {
     albums.add(Album(
@@ -29,14 +29,34 @@ void main() {
       return album.toJson();
     }
   ).toList());
-  Response response = http.Response(jsonAlbums,200);
+
   test("Test for getting albums", () {
-    when(client.get(Uri.parse(_url))).thenAnswer((_)=>Future.value(response));
+    when(albumsService.client.get(Uri.parse(_url))).thenAnswer((_)=>Future.value(http.Response(jsonAlbums,200)));
     expect(
       albumsService.getAlbums(),
-      emits(isA<List<Album>>().having((p0){
-        return p0.last.userId;
-      }, "description", albums.last.userId)),
+      emits(albums),
+    );
+  });
+  test("Test for socket exception", () {
+    when(albumsService.client.get(Uri.parse(_url))).thenAnswer((_)=>Future.error(SocketException("no internet connection")));
+    expect(
+      albumsService.getAlbums(),
+      emitsError(isA<SocketException>().having((socketExeption) => socketExeption.message, "SocketException Message", "no internet connection")),
+    );
+  });
+  test("Test for not socket exception", () {
+    when(albumsService.client.get(Uri.parse(_url))).thenAnswer((_)=>Future.error(Exception("exception")));
+    expect(
+      albumsService.getAlbums(),
+      emitsError(isNot(SocketException)),
+    );
+  });
+
+  test("Test for other exceptions", () {
+    when(albumsService.client.get(Uri.parse(_url))).thenAnswer((_)=>Future.error(Exception("exception")));
+    expect(
+      albumsService.getAlbums(),
+      emitsError(isA<Exception>()),
     );
   });
 }
