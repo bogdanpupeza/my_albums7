@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -44,19 +45,13 @@ void main() {
       emitsError(isA<SocketException>().having((socketExeption) => socketExeption.message, "SocketException Message", "no internet connection")),
     );
   });
-  test("Test for not socket exception", () {
-    when(albumsService.client.get(Uri.parse(_url))).thenAnswer((_)=>Future.error(Exception("exception")));
-    expect(
-      albumsService.getAlbums(),
-      emitsError(isNot(SocketException)),
-    );
-  });
-
   test("Test for other exceptions", () {
-    when(albumsService.client.get(Uri.parse(_url))).thenAnswer((_)=>Future.error(Exception("exception")));
+    when(albumsService.client.get(Uri.parse(_url))).thenAnswer((_)=>Future.error(HttpException("error")));
     expect(
       albumsService.getAlbums(),
-      emitsError(isA<Exception>()),
+      emitsError(isA<IOException>()
+      .having((error) => error.runtimeType, "Checking the error type", HttpException)
+      .having((error) => error.toString(), "Checking the error and its message", HttpException("error").toString())),
     );
   });
 }
