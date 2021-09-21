@@ -29,8 +29,8 @@ void main() {
 
   DateTime date = DateTime.now();
 
-  group("Tests for getting albums ", () {
-    test("Test for getting albums from Service", () {
+  group("Tests for getAlbums()", () {
+    test("Test for getting albums from Service and dateTime for lastUpdate", () {
       when(albumsCache.getLastDate()).thenAnswer((_) {
         return Stream.value(date);
       });
@@ -49,7 +49,7 @@ void main() {
     });
 
     test(
-        "Test for getting albums from Cache when there is no internet connection",
+        "Test for getting albums from Cache and dateTime for lastUpdate when there is no internet connection",
         () {
       when(albumsCache.getLastDate()).thenAnswer((_) {
         return Stream.value(date);
@@ -69,12 +69,38 @@ void main() {
         }, "test if we get date from albums response", date)),
       );
     });
+    test(
+        "Test for getting error from Cache when there are no albums saved",
+        () {
+        when(albumsCache.getLastDate()).thenAnswer((_) {
+          return Stream.value(date);
+        });
+        when(albumsCache.getAlbums()).thenAnswer((_) {
+          return Stream.error(Exception());
+        });
+        when(albumsService.getAlbums())
+            .thenAnswer((_) => Stream.error(Exception("")));
+        expect(
+          albumsRepository.getAlbums(),
+          emits(isA<Exception>()),
+        );
+    });
   });
 
   test("Test for getting favorites", () {
     when(albumsCache.getFavorites()).thenAnswer((_) {
       return Stream.value(favorites);
     });
+    expect(albumsRepository.getFavorites(), emits(favorites));
+  });
+
+  test("Test for toggleAlbum()", (){
+    when(albumsCache.getFavorites()).thenAnswer((_) {
+      return Stream.value(favorites);
+    });
+    when(albumsCache.setFavorites(favorites));
     expect(albumsRepository.toggleAlbum(1), emits(favorites));
+
+    verify(albumsCache.setFavorites(favorites));
   });
 }

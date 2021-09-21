@@ -19,8 +19,7 @@ class AlbumsRepository{
   DateTime? _lastUpdate;
 
   Stream<List<int>> toggleAlbum(int id){
-    Stream<List<int>> favoritesStream = albumsCache.getFavorites();
-    Stream<List<int>> actualFavorites = favoritesStream.map((favorites){
+    return albumsCache.getFavorites().map((favorites){
       if(favorites.any((element) => element == id)) {
         favorites.remove(id);
       } else {
@@ -29,7 +28,6 @@ class AlbumsRepository{
       albumsCache.setFavorites(favorites);
       return favorites;
     });
-    return actualFavorites;
   }
 
   Stream<List<int>> getFavorites(){
