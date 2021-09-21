@@ -29,8 +29,8 @@ void main() {
 
   DateTime date = DateTime.now();
 
-  group("Test for getting albums ", () {
-    test("from Service", () {
+  group("Tests for getting albums ", () {
+    test("Test for getting albums from Service", () {
       when(albumsCache.getLastDate()).thenAnswer((_) {
         return Stream.value(date);
       });
@@ -39,19 +39,18 @@ void main() {
       });
       expect(
         albumsRepository.getAlbums(),
-        emits(isA<AlbumsResponse>().having((albumResponse){
+        emits(isA<AlbumsResponse>().having((albumResponse) {
           return albumResponse.albums;
-        }, "Albums", albums)),
-      );
-      expect(
-        albumsRepository.getAlbums(),
-        emits(isA<AlbumsResponse>().having((albumResponse){
+        }, "test if we get albums from albums response", albums).having(
+            (albumResponse) {
           return albumResponse.lastUpdate;
-        }, "Date", date)),
+        }, "test if we get date from albums response", date)),
       );
     });
 
-    test("from Cache", () {
+    test(
+        "Test for getting albums from Cache when there is no internet connection",
+        () {
       when(albumsCache.getLastDate()).thenAnswer((_) {
         return Stream.value(date);
       });
@@ -62,15 +61,12 @@ void main() {
           .thenAnswer((_) => Stream.error(SocketException("")));
       expect(
         albumsRepository.getAlbums(),
-        emits(isA<AlbumsResponse>().having((albumResponse){
+        emits(isA<AlbumsResponse>().having((albumResponse) {
           return albumResponse.albums;
-        }, "Albums", albums)),
-      );
-       expect(
-        albumsRepository.getAlbums(),
-        emits(isA<AlbumsResponse>().having((albumResponse){
+        }, "test if we get albums from albums response", albums).having(
+            (albumResponse) {
           return albumResponse.lastUpdate;
-        }, "Date", date)),
+        }, "test if we get date from albums response", date)),
       );
     });
   });
