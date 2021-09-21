@@ -8,6 +8,7 @@ class AlbumsCache{
   final String _favoritesKey = "favorites";
   final Future<SharedPreferences> sharedPreferences;
   AlbumsCache(this.sharedPreferences);
+  
   Stream<List<Album>> getAlbums (){
     List<Album> albumsList = [];
     List<dynamic> responseJson;
