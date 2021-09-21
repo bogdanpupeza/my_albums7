@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:ffi';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/albums.dart';
 
@@ -22,12 +24,12 @@ class AlbumsCache{
           return albumsList;
         }
       ).onError((error, stackTrace){
-        throw Error(); 
+        throw Exception(); 
       })
     );
   }
   
-  void setAlbums(List<Album> albums){
+  Future<void> setAlbums(List<Album> albums){
     sharedPreferences.then(
       (pref){
         String jsonData = jsonEncode(
@@ -38,15 +40,17 @@ class AlbumsCache{
         pref.setString(_albumsCacheListKey, jsonData);
       }
     );
+    return Future(() => null);
   }
 
-  void setDate(DateTime dateTime){
+  Future<void> setDate(DateTime dateTime){
     sharedPreferences.then(
       (pref){
         String dateString = dateTime.toIso8601String();
         pref.setString(_dateKey, dateString);
       }
     );
+    return Future(() => null);
   }
 
   Stream<DateTime?> getLastDate (){
@@ -83,7 +87,7 @@ class AlbumsCache{
     );
   }
 
-  void setFavorites(List<int> favorites){
+  Future<void> setFavorites(List<int> favorites){
     sharedPreferences.then(
       (pref){
         List<String> ids =
@@ -93,7 +97,6 @@ class AlbumsCache{
         pref.setStringList(_favoritesKey, ids);
       }
     );
+    return Future(() => null);
   }
-
-  
 }

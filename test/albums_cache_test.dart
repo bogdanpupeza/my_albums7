@@ -11,17 +11,12 @@ import 'albums_cache_test.mocks.dart';
 
 @GenerateMocks([SharedPreferences])
 void main() {
-
-
-
-
   MockSharedPreferences mockSharedPreferences = MockSharedPreferences();
   Future<MockSharedPreferences> sharedPrefs =
       Future.value(mockSharedPreferences);
   AlbumsCache albumsCache = AlbumsCache(sharedPrefs);
 
-  DateTime date = DateTime.now();
-  String dateString = date.toIso8601String();
+
 
   List<Album> albums = [];
   List<String> favoritesString = [];
@@ -40,6 +35,14 @@ void main() {
     return album.toJson();
   }).toList());
 
+  test("Test for setting favorites", () async {
+    final String _favoritesKey = "favorites";
+    when(mockSharedPreferences.setStringList(_favoritesKey, favoritesString))
+        .thenAnswer((_) => Future.value(true));
+    await albumsCache.setFavorites(favorites);
+    verify(mockSharedPreferences.setStringList(_favoritesKey, favoritesString));
+  });
+
   test("Test for getting favorites", () {
     final String _favoritesKey = "favorites";
     when(mockSharedPreferences.getStringList(_favoritesKey))
@@ -49,9 +52,31 @@ void main() {
       emits(favorites),
     );
   });
+  test("Test for getting an empty list we try to get favorites", ()  {
+    final String _favoritesKey = "favorites";
+    when(mockSharedPreferences.getStringList(_favoritesKey))
+        .thenThrow((_)=>Future.value(Error));
+    expect(
+      albumsCache.getFavorites(),
+      emits([]),
+    );
+  });
+
+  test("Test for setting date", () async {
+    final String _dateKey = "dateKey";
+    DateTime date = DateTime.now();
+    String dateString = date.toIso8601String();
+
+    when(mockSharedPreferences.setString(_dateKey, dateString))
+        .thenAnswer((_) => Future.value(true));
+    await albumsCache.setDate(date);
+    verify(mockSharedPreferences.setString(_dateKey, dateString));
+  });
 
   test("Test for getting date", () {
     final String _dateKey = "dateKey";
+    DateTime date = DateTime.now();
+    String dateString = date.toIso8601String();
     when(mockSharedPreferences.getString(_dateKey))
         .thenAnswer((_) => (dateString));
     expect(
@@ -59,7 +84,24 @@ void main() {
       emits(date),
     );
   });
+  test("Test for getting null when we try to get date", ()  {
+    final String _dateKey = "dateKey";
+    when(mockSharedPreferences.getString(_dateKey))
+        .thenThrow((_)=>Future.value(Error));
+    expect(
+      albumsCache.getLastDate(),
+      emits(null),
+    );
+  });
 
+  test("Test for setting albums", () async {
+    final String _albumsCacheListKey = "albumsList";
+    when(mockSharedPreferences.setString(_albumsCacheListKey, albumsString))
+        .thenAnswer((_) => Future.value(true));
+    await albumsCache.setAlbums(albums);
+    verify(mockSharedPreferences.setString(_albumsCacheListKey, albumsString));
+  });
+  
   test("Test for getting albums", () {
     final String _albumsCacheListKey = "albumsList";
     when(mockSharedPreferences.getString(_albumsCacheListKey))
@@ -69,9 +111,13 @@ void main() {
       emits(albums),
     );
   });
-
-  test("Test for setting favorites", () {
-    final String _favoritesKey = "favorites";
-    when(mockSharedPreferences.setStringList(_favoritesKey, favorites))
+  test("Test for getting error when we try to get albums", ()  {
+    final String _albumsCacheListKey = "albumsList";
+    when(mockSharedPreferences.getString(_albumsCacheListKey))
+        .thenThrow((_)=>Future.value(Exception));
+    expect(
+      albumsCache.getAlbums(),
+      emitsError(isA<Exception>()),
+    );
   });
 }
