@@ -52,7 +52,7 @@ void main() {
       emits(favorites),
     );
   });
-  test("Test for getting an empty list we try to get favorites", ()  {
+  test("Test for getting an empty list when we try to get favorites", ()  {
     final String _favoritesKey = "favorites";
     when(mockSharedPreferences.getStringList(_favoritesKey))
         .thenThrow((_)=>Future.value(Error));
