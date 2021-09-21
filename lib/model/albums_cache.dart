@@ -29,28 +29,26 @@ class AlbumsCache{
     );
   }
   
-  Future<void> setAlbums(List<Album> albums){
-    sharedPreferences.then(
+  Stream<bool> setAlbums(List<Album> albums){
+    return sharedPreferences.then(
       (pref){
         String jsonData = jsonEncode(
           albums.map((album){
             return album.toJson();
           }).toList()
         );
-        pref.setString(_albumsCacheListKey, jsonData);
+        return pref.setString(_albumsCacheListKey, jsonData);
       }
-    );
-    return Future(() => null);
+    ).asStream();
   }
 
-  Future<void> setDate(DateTime dateTime){
-    sharedPreferences.then(
+  Stream<bool> setDate(DateTime dateTime){
+    return sharedPreferences.then(
       (pref){
         String dateString = dateTime.toIso8601String();
-        pref.setString(_dateKey, dateString);
+        return pref.setString(_dateKey, dateString);
       }
-    );
-    return Future(() => null);
+    ).asStream();
   }
 
   Stream<DateTime?> getLastDate (){
@@ -87,16 +85,15 @@ class AlbumsCache{
     );
   }
 
-  Future<void> setFavorites(List<int> favorites){
-    sharedPreferences.then(
+  Stream<bool> setFavorites(List<int> favorites){
+    return sharedPreferences.then(
       (pref){
         List<String> ids =
           favorites.map((albumId){
             return albumId.toString();
           }).toList();
-        pref.setStringList(_favoritesKey, ids);
+        return pref.setStringList(_favoritesKey, ids);
       }
-    );
-    return Future(() => null);
+    ).asStream();
   }
 }
