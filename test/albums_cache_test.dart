@@ -11,9 +11,9 @@ import 'albums_cache_test.mocks.dart';
 
 @GenerateMocks([SharedPreferences])
 void main() {
-  final String _albumsCacheListKey = "albumsList";
-  final String _dateKey = "dateKey";
-  final String _favoritesKey = "favorites";
+
+
+
 
   MockSharedPreferences mockSharedPreferences = MockSharedPreferences();
   Future<MockSharedPreferences> sharedPrefs =
@@ -41,6 +41,7 @@ void main() {
   }).toList());
 
   test("Test for getting favorites", () {
+    final String _favoritesKey = "favorites";
     when(mockSharedPreferences.getStringList(_favoritesKey))
         .thenAnswer((_) => (favoritesString));
     expect(
@@ -50,6 +51,7 @@ void main() {
   });
 
   test("Test for getting date", () {
+    final String _dateKey = "dateKey";
     when(mockSharedPreferences.getString(_dateKey))
         .thenAnswer((_) => (dateString));
     expect(
@@ -59,11 +61,17 @@ void main() {
   });
 
   test("Test for getting albums", () {
+    final String _albumsCacheListKey = "albumsList";
     when(mockSharedPreferences.getString(_albumsCacheListKey))
         .thenAnswer((_) => (albumsString));
     expect(
       albumsCache.getAlbums(),
       emits(albums),
     );
+  });
+
+  test("Test for setting favorites", () {
+    final String _favoritesKey = "favorites";
+    when(mockSharedPreferences.setStringList(_favoritesKey, favorites))
   });
 }
