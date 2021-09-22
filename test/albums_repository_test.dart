@@ -99,11 +99,11 @@ void main() {
     when(albumsCache.getFavorites()).thenAnswer((_) {
       return Stream.value(favorites);
     });
-    var favorites2 = favorites;
     when(albumsCache.setFavorites(favorites)).thenAnswer((_) => Stream.value(true));
     expect(albumsRepository.toggleAlbum(1), emits(favorites));
-    //
     favorites.add(1);
+    //this does not work:
     //verify(albumsCache.setFavorites(favorites));
+    
   });
 }
