@@ -8,6 +8,7 @@ import 'package:mockito/mockito.dart' as _i1;
 import 'package:my_albums6/model/albums.dart' as _i4;
 import 'package:my_albums6/model/albums_cache.dart' as _i2;
 import 'package:my_albums6/model/albums_service.dart' as _i5;
+import 'package:my_albums6/model/date_update.dart' as _i6;
 
 // ignore_for_file: avoid_redundant_argument_values
 // ignore_for_file: avoid_setters_without_getters
@@ -17,6 +18,8 @@ import 'package:my_albums6/model/albums_service.dart' as _i5;
 // ignore_for_file: prefer_const_constructors
 // ignore_for_file: unnecessary_parenthesis
 // ignore_for_file: camel_case_types
+
+class _FakeDateTime_0 extends _i1.Fake implements DateTime {}
 
 /// A class which mocks [AlbumsCache].
 ///
@@ -48,9 +51,9 @@ class MockAlbumsCache extends _i1.Mock implements _i2.AlbumsCache {
       (super.noSuchMethod(Invocation.method(#getFavorites, []),
           returnValue: Stream<List<int>>.empty()) as _i3.Stream<List<int>>);
   @override
-  void setFavorites(List<int>? favorites) =>
-      super.noSuchMethod(Invocation.method(#setFavorites, [favorites]),
-          returnValueForMissingStub: null);
+  _i3.Stream<bool> setFavorites(List<int>? favorites) =>
+      (super.noSuchMethod(Invocation.method(#setFavorites, [favorites]),
+          returnValue: Stream<bool>.empty()) as _i3.Stream<bool>);
   @override
   String toString() => super.toString();
 }
@@ -68,6 +71,21 @@ class MockAlbumsService extends _i1.Mock implements _i5.AlbumsService {
       (super.noSuchMethod(Invocation.method(#getAlbums, []),
               returnValue: Stream<List<_i4.Album>>.empty())
           as _i3.Stream<List<_i4.Album>>);
+  @override
+  String toString() => super.toString();
+}
+
+/// A class which mocks [DateUpdate].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockDateUpdate extends _i1.Mock implements _i6.DateUpdate {
+  MockDateUpdate() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  DateTime get getDate => (super.noSuchMethod(Invocation.getter(#getDate),
+      returnValue: _FakeDateTime_0()) as DateTime);
   @override
   String toString() => super.toString();
 }

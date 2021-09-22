@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:my_albums6/model/albums.dart';
@@ -6,14 +7,16 @@ import 'package:my_albums6/model/albums_cache.dart';
 import 'package:my_albums6/model/albums_repository.dart';
 import 'package:my_albums6/model/albums_service.dart';
 import 'package:mockito/mockito.dart';
+import 'package:my_albums6/model/date_update.dart';
 import 'albums_repository_test.mocks.dart';
 
-@GenerateMocks([AlbumsCache, AlbumsService])
+@GenerateMocks([AlbumsCache, AlbumsService, DateUpdate])
 void main() {
   AlbumsService albumsService = MockAlbumsService();
   AlbumsCache albumsCache = MockAlbumsCache();
+  DateUpdate dateUpdate = MockDateUpdate();
   AlbumsRepository albumsRepository =
-      AlbumsRepository(albumsService, albumsCache);
+      AlbumsRepository(albumsService, albumsCache, dateUpdate);
   List<Album> albums = [];
   List<int> favorites = [];
 
@@ -29,14 +32,12 @@ void main() {
 
   DateTime date = DateTime.now();
 
-  group("Tests for getAlbums()", () {
-    test("Test for getting albums from Service and dateTime for lastUpdate", () {
-      when(albumsCache.getLastDate()).thenAnswer((_) {
-        return Stream.value(date);
-      });
+  group("Tests for getAlbums():", () {
+    test("Test for getting an albums list from Service and a date from DateUpdate for creating the albums response", () {
       when(albumsService.getAlbums()).thenAnswer((_) {
         return Stream.value(albums);
       });
+      when(dateUpdate.getDate).thenReturn(date);
       expect(
         albumsRepository.getAlbums(),
         emits(isA<AlbumsResponse>().having((albumResponse) {
@@ -49,7 +50,7 @@ void main() {
     });
 
     test(
-        "Test for getting albums from Cache and dateTime for lastUpdate when there is no internet connection",
+        "Test for getting an albums list and a date, for creating the albums response, from Cache when there is no internet connection",
         () {
       when(albumsCache.getLastDate()).thenAnswer((_) {
         return Stream.value(date);
@@ -70,19 +71,19 @@ void main() {
       );
     });
     test(
-        "Test for getting error from Cache when there are no albums saved",
+        "Test for getting error from Cache",
         () {
         when(albumsCache.getLastDate()).thenAnswer((_) {
           return Stream.value(date);
         });
         when(albumsCache.getAlbums()).thenAnswer((_) {
-          return Stream.error(Exception());
+          return Stream.error(FlutterError("Something went wrong."));
         });
         when(albumsService.getAlbums())
-            .thenAnswer((_) => Stream.error(Exception("")));
+            .thenAnswer((_) => Stream.error(SocketException("no internet connection")));
         expect(
           albumsRepository.getAlbums(),
-          emits(isA<Exception>()),
+          emitsError(isA<FlutterError>().having((error) => error.message, "description", "Something went wrong.")),
         );
     });
   });
@@ -98,9 +99,11 @@ void main() {
     when(albumsCache.getFavorites()).thenAnswer((_) {
       return Stream.value(favorites);
     });
-    when(albumsCache.setFavorites(favorites));
+    var favorites2 = favorites;
+    when(albumsCache.setFavorites(favorites)).thenAnswer((_) => Stream.value(true));
     expect(albumsRepository.toggleAlbum(1), emits(favorites));
-
-    verify(albumsCache.setFavorites(favorites));
+    //
+    favorites.add(1);
+    //verify(albumsCache.setFavorites(favorites));
   });
 }

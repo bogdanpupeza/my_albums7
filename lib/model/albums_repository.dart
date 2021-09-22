@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:my_albums6/model/date_update.dart';
 import 'package:rxdart/rxdart.dart';
 import '../model/albums_cache.dart';
 import '../model/albums_service.dart';
@@ -9,13 +10,9 @@ import '../model/albums.dart';
 class AlbumsRepository {
   final AlbumsService albumsService;
   final AlbumsCache albumsCache;
+  final DateUpdate dateUpdate;
 
-  AlbumsRepository(
-    this.albumsService,
-    this.albumsCache,
-  );
-
-  DateTime? _lastUpdate;
+  AlbumsRepository(this.albumsService, this.albumsCache, this.dateUpdate);
 
   Stream<List<int>> toggleAlbum(int id) {
     return albumsCache.getFavorites().map((favorites) {
@@ -34,33 +31,27 @@ class AlbumsRepository {
   }
 
   Stream<AlbumsResponse> getAlbums() {
-    return(
-      albumsService.getAlbums().flatMap((albumsList) {
-        DateTime lastUpdate = DateTime.now();
-        albumsCache.setAlbums(albumsList);
-        albumsCache.setDate(lastUpdate);
-      return Stream.value(
-        AlbumsResponse(
-          albums: albumsList,
-          lastUpdate: lastUpdate,
-        )
-      );
-      }).onErrorResume((error, stackTrace) {
+    return (albumsService.getAlbums().flatMap((albumsList) {
+      DateTime lastUpdate = dateUpdate.getDate;
+      albumsCache.setAlbums(albumsList);
+      albumsCache.setDate(lastUpdate);
+      return Stream.value(AlbumsResponse(
+        albums: albumsList,
+        lastUpdate: lastUpdate,
+      ));
+    }).onErrorResume((error, stackTrace) {
       if (error is SocketException) {
-        return albumsCache.getLastDate().flatMap((date) {
-          return albumsCache.getAlbums().flatMap((albumsList){
-            return Stream.value(
-              AlbumsResponse(
-                albums: albumsList,
-                lastUpdate: date,
-              )
-            );
+        return albumsCache.getAlbums().flatMap((albumsList) {
+          return albumsCache.getLastDate().flatMap((date) {
+            return Stream.value(AlbumsResponse(
+              albums: albumsList,
+              lastUpdate: date,
+            ));
           });
         });
-        } else {
-        return Stream.error(FlutterError("Something went wrong"));
-        }
-      })
-    );
+      } else {
+        return Stream.error(FlutterError("Something went wrong:\n$error"));
+      }
+    }));
   }
 }

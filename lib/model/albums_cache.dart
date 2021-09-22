@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/albums.dart';
 
@@ -21,7 +22,7 @@ class AlbumsCache{
           return albumsList;
         }
       ).onError((error, stackTrace){
-        throw Error(); 
+        throw FlutterError("Something went wrong.\n$error"); 
       })
     );
   }
@@ -82,16 +83,16 @@ class AlbumsCache{
     );
   }
 
-  void setFavorites(List<int> favorites){
-    SharedPreferences.getInstance().then(
+  Stream<bool> setFavorites(List<int> favorites){
+    return SharedPreferences.getInstance().then(
       (pref){
         List<String> ids =
           favorites.map((albumId){
             return albumId.toString();
           }).toList();
-        pref.setStringList(_favoritesKey, ids);
+        return pref.setStringList(_favoritesKey, ids);
       }
-    );
+    ).asStream();
   }
 
   
