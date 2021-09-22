@@ -31,22 +31,22 @@ class AlbumsRepository {
   }
 
   Stream<AlbumsResponse> getAlbums() {
-    return (albumsService.getAlbums().flatMap((albumsList) {
+    return (albumsService.getAlbums().map((albumsList) {
       DateTime lastUpdate = dateUpdate.getDate;
       albumsCache.setAlbums(albumsList);
       albumsCache.setDate(lastUpdate);
-      return Stream.value(AlbumsResponse(
+      return AlbumsResponse(
         albums: albumsList,
         lastUpdate: lastUpdate,
-      ));
+      );
     }).onErrorResume((error, stackTrace) {
       if (error is SocketException) {
         return albumsCache.getAlbums().flatMap((albumsList) {
-          return albumsCache.getLastDate().flatMap((date) {
-            return Stream.value(AlbumsResponse(
+          return albumsCache.getLastDate().map((date) {
+            return AlbumsResponse(
               albums: albumsList,
               lastUpdate: date,
-            ));
+            );
           });
         });
       } else {
