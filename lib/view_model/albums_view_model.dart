@@ -1,9 +1,11 @@
+import 'package:my_albums6/model/date_update.dart';
 import 'package:rxdart/rxdart.dart';
 import '../model/albums.dart';
 import '../model/albums_repository.dart';
 
-class AlbumsVM {
-  final AlbumsRepository albumsRepository;
+class AlbumsVM{
+  final albumsRepository = AlbumsRepository(AlbumsService(),AlbumsCache(), DateUpdate());
+
   final Input input;
   late Output output;
 

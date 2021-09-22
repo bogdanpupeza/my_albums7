@@ -1,25 +1,23 @@
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:my_albums6/model/date_update.dart';
 import 'package:rxdart/rxdart.dart';
 import '../model/albums_cache.dart';
 import '../model/albums_service.dart';
 import '../model/albums.dart';
 
-
-class AlbumsRepository{
-
+class AlbumsRepository {
   final AlbumsService albumsService;
   final AlbumsCache albumsCache;
+  final DateUpdate dateUpdate;
 
-  AlbumsRepository(
-    this.albumsService,
-    this.albumsCache,
-  );
 
-  Stream<List<int>> toggleAlbum(int id){
-    Stream<List<int>> favoritesStream = albumsCache.getFavorites();
-    Stream<List<int>> actualFavorites = favoritesStream.map((favorites){
-      if(favorites.any((element) => element == id)) {
+  AlbumsRepository(this.albumsService, this.albumsCache, this.dateUpdate);
+
+  Stream<List<int>> toggleAlbum(int id) {
+    return albumsCache.getFavorites().map((favorites) {
+      if (favorites.any((element) => element == id)) {
         favorites.remove(id);
       } else {
         favorites.add(id);
@@ -27,36 +25,34 @@ class AlbumsRepository{
       albumsCache.setFavorites(favorites);
       return favorites;
     });
-    return actualFavorites;
   }
 
-  Stream<List<int>> getFavorites(){
+  Stream<List<int>> getFavorites() {
     return albumsCache.getFavorites();
   }
 
-  Stream<AlbumsResponse> getAlbums(){
-    DateTime? _lastUpdate;
-    Stream<DateTime?> dateStream = albumsCache.getLastDate();
-    Stream<List<Album>> albumsStream = 
-    albumsService.getAlbums().map((albumsList){
+  Stream<AlbumsResponse> getAlbums() {
+    return (albumsService.getAlbums().map((albumsList) {
+      DateTime lastUpdate = dateUpdate.getDate;
       albumsCache.setAlbums(albumsList);
-      _lastUpdate = DateTime.now();
-      albumsCache.setDate(_lastUpdate!);
-      return albumsList;
-    }).onErrorResume(
-      (error, stackTrace){
-        if(error is SocketException){
-          return dateStream.flatMap((date){
-            _lastUpdate = date;
-            return albumsCache.getAlbums();
+      albumsCache.setDate(lastUpdate);
+      return AlbumsResponse(
+        albums: albumsList,
+        lastUpdate: lastUpdate,
+      );
+    }).onErrorResume((error, stackTrace) {
+      if (error is SocketException) {
+        return albumsCache.getAlbums().flatMap((albumsList) {
+          return albumsCache.getLastDate().map((date) {
+            return AlbumsResponse(
+              albums: albumsList,
+              lastUpdate: date,
+            );
           });
-        }
-        throw error;
+        });
+      } else {
+        return Stream.error(FlutterError(error.toString()));
       }
-    );
-    
-    return albumsStream.map((albumsList){
-      return AlbumsResponse(albums: albumsList, lastUpdate: _lastUpdate);
-    });
+    }));
   }
 }
