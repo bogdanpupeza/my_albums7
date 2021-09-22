@@ -35,11 +35,13 @@ void main() {
     return album.toJson();
   }).toList());
 
-  test("Test for setting favorites", () {
+  test("Test for setting favorites", () async {
     final String _favoritesKey = "favorites";
     when(mockSharedPreferences.setStringList(_favoritesKey, favoritesString))
         .thenAnswer((_) => Future.value(true));
      expect(albumsCache.setFavorites(favorites), emits(true));
+     await albumsCache.setFavorites(favorites).first;
+    verify(mockSharedPreferences.setStringList(_favoritesKey, favoritesString));
   });
 
   test("Test for getting favorites", () {
@@ -61,7 +63,7 @@ void main() {
     );
   });
 
-  test("Test for setting date", () {
+  test("Test for setting date", () async {
     final String _dateKey = "dateKey";
     DateTime date = DateTime.now();
     String dateString = date.toIso8601String();
@@ -69,6 +71,8 @@ void main() {
     when(mockSharedPreferences.setString(_dateKey, dateString))
         .thenAnswer((_) => Future.value(true));
     expect(albumsCache.setDate(date), emits(true));
+    await albumsCache.setDate(date).first;
+    verify(mockSharedPreferences.setString(_dateKey, dateString));
   });
 
   test("Test for getting date", () {
@@ -92,11 +96,13 @@ void main() {
     );
   });
 
-  test("Test for setting albums", () {
+  test("Test for setting albums", () async {
     final String _albumsCacheListKey = "albumsList";
     when(mockSharedPreferences.setString(_albumsCacheListKey, albumsString))
         .thenAnswer((_) => Future.value(true));
     expect(albumsCache.setAlbums(albums), emits(true));
+    await albumsCache.setAlbums(albums).first;
+    verify(mockSharedPreferences.setString(_albumsCacheListKey, albumsString));
   });
   
   test("Test for getting albums", () {

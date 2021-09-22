@@ -85,7 +85,7 @@ class AlbumsCache{
     );
   }
 
-  Stream<bool> setFavorites(List<int> favorites){
+  Stream<bool> setFavorites (List<int> favorites){
     return sharedPreferences.then(
       (pref){
         List<String> ids =
