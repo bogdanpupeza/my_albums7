@@ -50,7 +50,7 @@ class AlbumsRepository {
           });
         });
       } else {
-        return Stream.error(FlutterError("Something went wrong:\n$error"));
+        return Stream.error(FlutterError(error.toString()));
       }
     }));
   }

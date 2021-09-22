@@ -32,8 +32,9 @@ void main() {
 
   DateTime date = DateTime.now();
 
-  group("Tests for getAlbums():", () {
-    test("Test for getting an albums list from Service and a date from DateUpdate for creating the albums response", () {
+    test(
+        "Test for getting an albums list from Service and a date from DateUpdate for creating the albums response",
+        () {
       when(albumsService.getAlbums()).thenAnswer((_) {
         return Stream.value(albums);
       });
@@ -70,23 +71,30 @@ void main() {
         }, "test if we get date from albums response", date)),
       );
     });
-    test(
-        "Test for getting error from Cache",
-        () {
-        when(albumsCache.getLastDate()).thenAnswer((_) {
-          return Stream.value(date);
-        });
-        when(albumsCache.getAlbums()).thenAnswer((_) {
-          return Stream.error(FlutterError("Something went wrong."));
-        });
-        when(albumsService.getAlbums())
-            .thenAnswer((_) => Stream.error(SocketException("no internet connection")));
-        expect(
-          albumsRepository.getAlbums(),
-          emitsError(isA<FlutterError>().having((error) => error.message, "description", "Something went wrong.")),
-        );
+    test("Test for getting error from Cache", () {
+      when(albumsCache.getLastDate()).thenAnswer((_) {
+        return Stream.value(date);
+      });
+      when(albumsCache.getAlbums()).thenAnswer((_) {
+        return Stream.error(FlutterError("Something went wrong."));
+      });
+      when(albumsService.getAlbums()).thenAnswer(
+          (_) => Stream.error(SocketException("no internet connection")));
+      expect(
+        albumsRepository.getAlbums(),
+        emitsError(isA<FlutterError>().having(
+            (error) => error.message, "description", "Something went wrong.")),
+      );
     });
-  });
+    test("Test for getting other errors from Service", () {
+      when(albumsService.getAlbums()).thenAnswer(
+          (_) => Stream.error(FlutterError("Something went wrong.")));
+      expect(
+        albumsRepository.getAlbums(),
+        emitsError(isA<FlutterError>().having(
+            (error) => error.message, "description", "Something went wrong.")),
+      );
+    });
 
   test("Test for getting favorites", () {
     when(albumsCache.getFavorites()).thenAnswer((_) {
@@ -95,15 +103,43 @@ void main() {
     expect(albumsRepository.getFavorites(), emits(favorites));
   });
 
-  test("Test for toggleAlbum()", (){
+  test("Test for toggleAlbum() getFavorites", () {
     when(albumsCache.getFavorites()).thenAnswer((_) {
       return Stream.value(favorites);
     });
-    when(albumsCache.setFavorites(favorites)).thenAnswer((_) => Stream.value(true));
+    when(albumsCache.setFavorites(favorites))
+        .thenAnswer((_) => Stream.value(true));
     expect(albumsRepository.toggleAlbum(1), emits(favorites));
-    favorites.add(1);
-    //this does not work:
-    //verify(albumsCache.setFavorites(favorites));
-    
+  });
+
+  test("Test for toggleAlbum() setFavorites", () {
+    when(albumsCache.getFavorites()).thenAnswer((_) {
+      return Stream.value(favorites);
+    });
+    when(albumsCache.setFavorites(favorites))
+        .thenAnswer((_) => Stream.value(true));
+    albumsRepository.albumsCache.setFavorites(favorites).first.then((_) {
+      verify(
+        albumsCache.setFavorites(
+          favorites,
+        ),
+      );
+    });
+  });
+
+  test("Test for toggleAlbum() getFavorites returns error", () {
+    when(albumsCache.getFavorites()).thenAnswer((_) {
+      return Stream.error(FlutterError("error"));
+    });
+    when(albumsCache.setFavorites(favorites))
+        .thenAnswer((_) => Stream.value(false));
+    expect(
+      albumsRepository.toggleAlbum(1),
+      emitsError(
+        isA<FlutterError>()
+            .having((error) => error.message, "description", "error"),
+      ),
+    );
+    verifyNever(albumsCache.setFavorites(favorites));
   });
 }
