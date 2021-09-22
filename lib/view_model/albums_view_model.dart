@@ -3,9 +3,10 @@ import '../model/albums_cache.dart';
 import '../model/albums.dart';
 import '../model/albums_repository.dart';
 import '../model/albums_service.dart';
+import 'package:http/http.dart' as http;
 
 class AlbumsVM{
-  final albumsRepository = AlbumsRepository(AlbumsService(),AlbumsCache());
+  final albumsRepository = AlbumsRepository(AlbumsService(http.Client()),AlbumsCache());
   final Input input;
   late Output output;
   
