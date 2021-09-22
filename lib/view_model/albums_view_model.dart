@@ -21,15 +21,16 @@ class AlbumsVM {
     });
 
     Stream<AlbumsResponse> combinedStream = Rx.combineLatest2(
-        albumsData, favoritesStream.startWith(_firstFavorites),
-        (AlbumsResponse albumsResponse, List<int> favorites) {
-      albumsResponse.albums.forEach((album) {
-        if (favorites.any((favAlbum) => favAlbum == album.id)) {
-          album.favorite = true;
-        } else {
-          album.favorite = false;
+      albumsData, favoritesStream.startWith(_firstFavorites),
+      (AlbumsResponse albumsResponse, List<int> favorites) {
+        albumsResponse.albums.forEach((album) {
+          if (favorites.any((favAlbum) => favAlbum == album.id)) {
+            album.favorite = true;
+          } else {
+            album.favorite = false;
+          }
         }
-      });
+      );
       return albumsResponse;
     });
     output = Output(combinedStream);
