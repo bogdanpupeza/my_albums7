@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:my_albums6/model/albums_cache.dart';
 import 'package:my_albums6/model/albums_repository.dart';
 import 'package:my_albums6/model/albums_service.dart';
+import 'package:my_albums6/model/date_update.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:http/http.dart' as http;
 
 import '../model/albums.dart';
 import './album.dart';
@@ -50,8 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
       BehaviorSubject<int>(),
     ),
     AlbumsRepository(
-      AlbumsService(),
+      AlbumsService(http.Client()),
       AlbumsCache(),
+      DateUpdate(),
     ),
   );
 
