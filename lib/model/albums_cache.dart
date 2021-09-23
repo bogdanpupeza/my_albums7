@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../model/albums.dart';
@@ -24,7 +23,7 @@ class AlbumsCache{
           return albumsList;
         }
       ).onError((error, stackTrace){
-        throw Exception(); 
+        throw FlutterError("Something went wrong.\n$error"); 
       })
     );
   }

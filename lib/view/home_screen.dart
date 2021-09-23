@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:my_albums6/model/albums_cache.dart';
+import 'package:my_albums6/model/albums_repository.dart';
+import 'package:my_albums6/model/albums_service.dart';
+import 'package:my_albums6/model/date_update.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:intl/intl.dart';
 
 import '../model/albums.dart';
 import './album.dart';
@@ -41,10 +44,16 @@ extension on Duration{
 
 
 class _HomeScreenState extends State<HomeScreen> {
+ 
   AlbumsVM albumsVM = AlbumsVM(
     Input(
       BehaviorSubject<bool>(),
       BehaviorSubject<int>(),
+    ),
+    AlbumsRepository(
+      AlbumsService(),
+      AlbumsCache(),
+      DateUpdate(),
     ),
   );
 
