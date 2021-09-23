@@ -37,7 +37,7 @@ class AlbumWidget extends StatelessWidget {
               alignment: Alignment.centerLeft,
               height: 40,
               child: Text(
-                name.toString(),
+                name == null? "Unnamed album" : name!,
                 overflow: TextOverflow.fade,
                 style: TextStyle(fontSize: 18),
               ),
