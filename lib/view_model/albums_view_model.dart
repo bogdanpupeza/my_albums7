@@ -1,16 +1,8 @@
-import 'package:my_albums6/model/albums_cache.dart';
-import 'package:my_albums6/model/albums_service.dart';
-import 'package:my_albums6/model/date_update.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../model/albums_cache.dart';
 import '../model/albums.dart';
 import '../model/albums_repository.dart';
-import '../model/albums_service.dart';
-import 'package:http/http.dart' as http;
-
 class AlbumsVM{
-  final albumsRepository;
+  final AlbumsRepository albumsRepository;
   final Input input;
   late Output output;
 
@@ -18,9 +10,10 @@ class AlbumsVM{
     List<int> _firstFavorites = [];
     Stream<AlbumsResponse> albumsData = input.loadData.flatMap((event) {
       return albumsRepository.getFavorites().flatMap((favorites) {
+        _firstFavorites = [];
         _firstFavorites.addAll(favorites);
         return albumsRepository.getAlbums();
-      });
+     });
     });
 
     Stream<List<int>> favoritesStream = input.toggleFavorite.flatMap((albumId) {
