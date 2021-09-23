@@ -34,36 +34,63 @@ void main(){
       )
     );
   }
-  group("Tests for getting albums",(){
-    Stream resultStream = albumsVM.output.albumsDataStream.asBroadcastStream();
-    test("Test for getting albums with favorite status initial value", (){
+  group("Tests for getting albumsResponse",(){
+    Stream<AlbumsResponse> resultStream = albumsVM.output.albumsDataStream.asBroadcastStream();
+    test("Test for getting albumsRespomse and an empty favorites list", (){
       when(albumsVM.albumsRepository.getAlbums()).thenAnswer((_) => Stream.value(AlbumsResponse(albums: albums, lastUpdate: date)));
       when(albumsVM.albumsRepository.getFavorites()).thenAnswer((_) => Stream.value([]));
       expect(
         resultStream,
         emits(isA<AlbumsResponse>().having((albumsResponse){
           return albumsResponse.albums;
-        }, "Albums", albums).having((albumsResponse){
+        }, "List of Albums", albums).having((albumsResponse){
           return albumsResponse.lastUpdate;
-        }, "Date", date)),
+        }, "Date of lastUpdate", date)),
       );
       albumsVM.input.loadData.add(true);
     });
 
-    test("Test for getting albums with favorite status updated", (){
+    test("Test toggleAlbum(1)", (){
       when(albumsVM.albumsRepository.getAlbums()).thenAnswer((_) => Stream.value(AlbumsResponse(albums: albums, lastUpdate: date)));
-      when(albumsVM.albumsRepository.getFavorites()).thenAnswer((_) => Stream.value([]));
+      when(albumsVM.albumsRepository.getFavorites()).thenAnswer((_) => Stream.value([] as List<int>));
       when(albumsVM.albumsRepository.toggleAlbum(1)).thenAnswer((_) => Stream.value([1]));
       expect(
         resultStream,
-        emits(isA<AlbumsResponse>().having((albumsResponse){
-          return albumsResponse.albums;
-        }, "Albums", albums).having((albumsResponse){
-          return albumsResponse.lastUpdate;
-        }, "Date", date)),
+        emits(isA<AlbumsResponse>())
       );
       albumsVM.input.loadData.add(true);
       albumsVM.input.toggleFavorite.add(1);
     });
+
+    test("Test for getting error from albumsRepository.getAlbums()", (){
+      when(albumsVM.albumsRepository.getAlbums()).thenAnswer((_) => Stream.error(Error()));
+      expect(
+        resultStream,
+        emitsError(isA<Error>()),
+      );
+      albumsVM.input.loadData.add(true);
+    });
+
+    test("Test for getting error from albumsRepository.getFavorites()", (){
+      when(albumsVM.albumsRepository.getFavorites()).thenAnswer((_) => Stream.error(Error()));
+      expect(
+        resultStream,
+        emitsError(isA<Error>()),
+      );
+      albumsVM.input.loadData.add(true);
+    });
+
+    test("Test for getting error from albumsRepository.toggleAlbum(albumId)", (){
+      when(albumsVM.albumsRepository.getAlbums()).thenAnswer((_) => Stream.error(Error()));
+      when(albumsVM.albumsRepository.getFavorites()).thenAnswer((_) => Stream.error(Error()));
+      expect(
+        resultStream,
+        emitsError(isA<Error>()),
+      );
+      albumsVM.input.loadData.add(true);
+    });
+
   });
+
+  
 }
