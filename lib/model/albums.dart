@@ -32,7 +32,7 @@ class Album {
   int get hashCode => super.hashCode;
 
   @override
-  bool operator ==(Object other) =>
+  bool operator == (Object other) =>
     other is Album &&
     other.favorite == favorite &&
     other.id == id &&
