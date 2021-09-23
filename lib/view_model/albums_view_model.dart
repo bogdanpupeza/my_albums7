@@ -4,10 +4,11 @@ import 'package:my_albums6/model/date_update.dart';
 import 'package:rxdart/rxdart.dart';
 import '../model/albums.dart';
 import '../model/albums_repository.dart';
+import '../model/albums_service.dart';
+import 'package:http/http.dart' as http;
 
 class AlbumsVM{
-  final AlbumsRepository albumsRepository;
-
+  final albumsRepository = AlbumsRepository(AlbumsService(http.Client()),AlbumsCache());
   final Input input;
   late Output output;
 
