@@ -10,8 +10,7 @@ import '../model/albums_service.dart';
 import 'package:http/http.dart' as http;
 
 class AlbumsVM{
-  final albumsRepository = AlbumsRepository(AlbumsService(http.Client()),
-    AlbumsCache(SharedPreferences.getInstance()),);
+  final albumsRepository;
   final Input input;
   late Output output;
 
@@ -28,7 +27,7 @@ class AlbumsVM{
       return albumsRepository.toggleAlbum(albumId);
     });
 
-    Stream<AlbumsResponse> combinedStream = Rx.combineLatest2(
+    Stream<AlbumsResponse> combinedStream = Rx. combineLatest2(
       albumsData, favoritesStream.startWith(_firstFavorites),
       (AlbumsResponse albumsResponse, List<int> favorites) {
         albumsResponse.albums.forEach((album) {
