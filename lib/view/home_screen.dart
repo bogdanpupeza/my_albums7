@@ -7,6 +7,8 @@ import './album.dart';
 import '../view_model/albums_view_model.dart';
 
 class HomeScreen extends StatefulWidget {
+  final AlbumsVM albumsVM;
+  HomeScreen(this.albumsVM);
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -41,19 +43,14 @@ extension on Duration{
 
 
 class _HomeScreenState extends State<HomeScreen> {
-  AlbumsVM albumsVM = AlbumsVM(
-    Input(
-      BehaviorSubject<bool>(),
-      BehaviorSubject<int>(),
-    ),
-  );
+  
 
   void getAlbums() {
-   albumsVM.input.loadData.add(true);
+   widget.albumsVM.input.loadData.add(true);
   }
 
   void toggleFavorite(int albumId){
-    albumsVM.input.toggleFavorite.add(albumId);
+    widget.albumsVM.input.toggleFavorite.add(albumId);
   }
 
   @override
@@ -65,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Center(
         child: GestureDetector(
           child: StreamBuilder<AlbumsResponse>(
-              stream: albumsVM.output.albumsDataStream,
+              stream: widget.albumsVM.output.albumsDataStream,
               builder: (ctx, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
