@@ -54,6 +54,7 @@ void main() {
         isFavorite = !isFavorite!;
       }
     }
+    await tester.pumpWidget(MaterialApp(
       home: Scaffold(
         body: Center(
           child: AlbumWidget(
