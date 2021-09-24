@@ -7,8 +7,7 @@ import '../model/albums_service.dart';
 import 'package:http/http.dart' as http;
 
 class AlbumsVM{
-  final albumsRepository;
-
+  final AlbumsRepository albumsRepository;
   final Input input;
   late Output output;
 
