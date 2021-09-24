@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:rxdart/rxdart.dart';
 
 import '../model/albums.dart';
@@ -9,7 +12,9 @@ class HomeScreen extends StatefulWidget {
   final AlbumsVM? albumsVM;
   HomeScreen([this.albumsVM]);
   @override
-  _HomeScreenState createState() => _HomeScreenState();
+  _HomeScreenState createState() => _HomeScreenState(
+    albumsVM == null ? AlbumsVM(Input(BehaviorSubject<bool>(), BehaviorSubject<int>())):albumsVM!
+  );
 }
 
 extension on Duration {
@@ -41,15 +46,10 @@ extension on Duration {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  AlbumsVM albumsVM = AlbumsVM(Input(
-    BehaviorSubject<bool>(),
-    BehaviorSubject<int>(),
-  ));
-  @override
-  void initState() {
-    albumsVM = widget.albumsVM == null ? albumsVM : widget.albumsVM!;
-    super.initState();
-  }
+
+  final AlbumsVM albumsVM;
+
+  _HomeScreenState(this.albumsVM);
 
   void getAlbums() {
     albumsVM.input.loadData.add(true);
@@ -111,7 +111,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
                 }
               }),
-          onDoubleTap: getAlbums,
+           onDoubleTap: getAlbums,
+          
         ),
       ),
     );

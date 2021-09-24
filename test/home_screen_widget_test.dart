@@ -93,11 +93,13 @@ void main() {
         ),
       ),
     );
-    //albumsVM.input.loadData.add(true);
+    
     await tester.pumpWidget(MaterialApp(
       home: HomeScreen(albumsVM),
     ));
-
+    //await tester.tap(find.widgetWithIcon(IconButton, Icons.favorite_outline));
+    await tester.createGesture();
+    await tester.pump();
     final titleFinder = find.text("My Albums");
     expect (titleFinder, findsOneWidget);
     albumsVM.input.loadData.add(true);
