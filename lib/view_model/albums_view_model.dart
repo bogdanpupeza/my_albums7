@@ -43,9 +43,9 @@ class AlbumsVM{
 }
 
 class Input{
-  Subject<bool> loadData;
-  Subject<int> toggleFavorite;
-  Input(
+  final Subject<bool> loadData;
+  final Subject<int> toggleFavorite;
+  const Input(
     this.loadData,
     this.toggleFavorite,
   );

@@ -1,37 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:intl/intl.dart';
 
 import '../model/albums.dart';
 import './album.dart';
 import '../view_model/albums_view_model.dart';
 
 class HomeScreen extends StatefulWidget {
-  final AlbumsVM albumsVM;
-  HomeScreen(this.albumsVM);
+  final AlbumsVM? albumsVM;
+  HomeScreen([this.albumsVM]);
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-extension on Duration{
-  String get showLastUpdate{
+extension on Duration {
+  String get showLastUpdate {
     String duration = "";
-    if(inDays > 0){
+    if (inDays > 0) {
       duration += "${(inDays.toString())} days ";
     } else {
-      if(inHours > 0) {
+      if (inHours > 0) {
         int hours = inHours % 24;
         duration += "${(hours.toString())} hours ";
-        if(inMinutes > 0){
+        if (inMinutes > 0) {
           int minutes = inMinutes % 60;
           duration += "${(minutes.toString())} minutes ";
         }
       } else {
-        if(inMinutes > 0){
+        if (inMinutes > 0) {
           int minutes = inMinutes % 60;
           duration += "${(minutes.toString())} minutes ";
         }
-        if(inSeconds >= 0){
+        if (inSeconds >= 0) {
           int seconds = inSeconds % 60;
           duration += "${(seconds.toString())} seconds";
         }
@@ -41,16 +40,23 @@ extension on Duration{
   }
 }
 
-
 class _HomeScreenState extends State<HomeScreen> {
-  
-
-  void getAlbums() {
-   widget.albumsVM.input.loadData.add(true);
+  AlbumsVM albumsVM = AlbumsVM(Input(
+    BehaviorSubject<bool>(),
+    BehaviorSubject<int>(),
+  ));
+  @override
+  void initState() {
+    albumsVM = widget.albumsVM == null ? albumsVM : widget.albumsVM!;
+    super.initState();
   }
 
-  void toggleFavorite(int albumId){
-    widget.albumsVM.input.toggleFavorite.add(albumId);
+  void getAlbums() {
+    albumsVM.input.loadData.add(true);
+  }
+
+  void toggleFavorite(int albumId) {
+    albumsVM.input.toggleFavorite.add(albumId);
   }
 
   @override
@@ -62,7 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Center(
         child: GestureDetector(
           child: StreamBuilder<AlbumsResponse>(
-              stream: widget.albumsVM.output.albumsDataStream,
+              stream: albumsVM.output.albumsDataStream,
               builder: (ctx, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
@@ -74,13 +80,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     var albums = data.albums;
                     var lastUpdate = data.lastUpdate;
                     Duration duration = const Duration();
-                    if(lastUpdate != null){
+                    if (lastUpdate != null) {
                       duration = DateTime.now().difference(lastUpdate);
                     }
                     return Column(
                       children: [
                         if (duration.inSeconds >= 5)
-                          Text("Results updated ${(duration.showLastUpdate)} ago"),
+                          Text(
+                              "Results updated ${(duration.showLastUpdate)} ago"),
                         if (duration.inSeconds < 5)
                           const Text("Results updated just now"),
                         Expanded(

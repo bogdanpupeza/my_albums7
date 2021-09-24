@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:my_albums6/view_model/albums_view_model.dart';
-import 'package:rxdart/rxdart.dart';
 import './view/home_screen.dart';
 
 void main() {
@@ -15,14 +13,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomeScreen(
-        AlbumsVM(
-          Input(
-            BehaviorSubject<bool>(),
-            BehaviorSubject<int>(),
-          ),
-        ),
-      ),
+      home: HomeScreen(),
     );
   }
 }
