@@ -49,6 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
   static const String circularProgressIndicatorKey =  "circularPI";
   static const String lastUpdateKey =  "lastUpdate";
   static const String albumsListKey =  "albumsList";
+  static const String titleKey = "title";
   String albumIdKey(int id){
     return "album$id";
   }
@@ -77,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Albums"), key: Key("title"),
+        title: const Text("My Albums"), key: Key(titleKey),
       ),
       body: Center(
         child: GestureDetector(
