@@ -7,14 +7,15 @@ class AlbumsCache{
   final String _albumsCacheListKey = "albumsList";
   final String _dateKey = "dateKey";
   final String _favoritesKey = "favorites";
-
-
+  final Future<SharedPreferences> sharedPreferences;
+  AlbumsCache(this.sharedPreferences);
+  
   Stream<List<Album>> getAlbums (){
     List<Album> albumsList = [];
     List<dynamic> responseJson;
     String response;
     return Stream.fromFuture(
-      SharedPreferences.getInstance().then(
+      sharedPreferences.then(
         (pref){
           response = pref.getString(_albumsCacheListKey) as String;
           responseJson = jsonDecode( response);
@@ -27,33 +28,33 @@ class AlbumsCache{
     );
   }
   
-  void setAlbums(List<Album> albums){
-    SharedPreferences.getInstance().then(
+  Stream<bool> setAlbums(List<Album> albums){
+    return sharedPreferences.then(
       (pref){
         String jsonData = jsonEncode(
           albums.map((album){
             return album.toJson();
           }).toList()
         );
-        pref.setString(_albumsCacheListKey, jsonData);
+        return pref.setString(_albumsCacheListKey, jsonData);
       }
-    );
+    ).asStream();
   }
 
-  void setDate(DateTime dateTime){
-    SharedPreferences.getInstance().then(
+  Stream<bool> setDate(DateTime dateTime){
+    return sharedPreferences.then(
       (pref){
         String dateString = dateTime.toIso8601String();
-        pref.setString(_dateKey, dateString);
+        return pref.setString(_dateKey, dateString);
       }
-    );
+    ).asStream();
   }
 
   Stream<DateTime?> getLastDate (){
     DateTime? dateTime;
     String dateString;
     return Stream.fromFuture(
-      SharedPreferences.getInstance().then(
+      sharedPreferences.then(
         (pref){
           dateString = pref.getString(_dateKey) as String;
           dateTime = DateTime.parse(dateString);
@@ -69,7 +70,7 @@ class AlbumsCache{
     List<int> favorites = [];
     List<String> response;
     return Stream.fromFuture(
-      SharedPreferences.getInstance().then(
+      sharedPreferences.then(
         (pref){
           response = pref.getStringList(_favoritesKey) as List<String>;
           favorites = response.map((idString){
@@ -83,8 +84,8 @@ class AlbumsCache{
     );
   }
 
-  Stream<bool> setFavorites(List<int> favorites){
-    return SharedPreferences.getInstance().then(
+  Stream<bool> setFavorites (List<int> favorites){
+    return sharedPreferences.then(
       (pref){
         List<String> ids =
           favorites.map((albumId){
@@ -94,6 +95,4 @@ class AlbumsCache{
       }
     ).asStream();
   }
-
-  
 }

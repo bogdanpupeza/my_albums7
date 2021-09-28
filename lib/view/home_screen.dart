@@ -5,7 +5,7 @@ import 'package:my_albums6/model/albums_service.dart';
 import 'package:my_albums6/model/date_update.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:http/http.dart' as http;
-
+import 'package:shared_preferences/shared_preferences.dart'; 
 import '../model/albums.dart';
 import './album.dart';
 import '../view_model/albums_view_model.dart';
@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
     AlbumsRepository(
       AlbumsService(http.Client()),
-      AlbumsCache(),
+      AlbumsCache(SharedPreferences.getInstance()),
       DateUpdate(),
     ),
   );

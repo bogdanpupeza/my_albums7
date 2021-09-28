@@ -5,7 +5,6 @@ import '../model/albums.dart';
 import '../model/albums_repository.dart';
 import '../model/albums_service.dart';
 import 'package:http/http.dart' as http;
-
 class AlbumsVM{
   final AlbumsRepository albumsRepository;
   final Input input;
@@ -15,16 +14,17 @@ class AlbumsVM{
     List<int> _firstFavorites = [];
     Stream<AlbumsResponse> albumsData = input.loadData.flatMap((event) {
       return albumsRepository.getFavorites().flatMap((favorites) {
+        _firstFavorites = [];
         _firstFavorites.addAll(favorites);
         return albumsRepository.getAlbums();
-      });
+     });
     });
 
     Stream<List<int>> favoritesStream = input.toggleFavorite.flatMap((albumId) {
       return albumsRepository.toggleAlbum(albumId);
     });
 
-    Stream<AlbumsResponse> combinedStream = Rx.combineLatest2(
+    Stream<AlbumsResponse> combinedStream = Rx. combineLatest2(
       albumsData, favoritesStream.startWith(_firstFavorites),
       (AlbumsResponse albumsResponse, List<int> favorites) {
         albumsResponse.albums.forEach((album) {

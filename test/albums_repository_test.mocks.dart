@@ -35,11 +35,11 @@ class MockAlbumsCache extends _i1.Mock implements _i2.AlbumsCache {
               returnValue: Stream<List<_i4.Album>>.empty())
           as _i3.Stream<List<_i4.Album>>);
   @override
-  void setAlbums(List<_i4.Album>? albums) =>
+  Stream<bool> setAlbums(List<_i4.Album>? albums) =>
       super.noSuchMethod(Invocation.method(#setAlbums, [albums]),
           returnValueForMissingStub: null);
   @override
-  void setDate(DateTime? dateTime) =>
+  Stream<bool> setDate(DateTime? dateTime) =>
       super.noSuchMethod(Invocation.method(#setDate, [dateTime]),
           returnValueForMissingStub: null);
   @override
