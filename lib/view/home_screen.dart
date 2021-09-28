@@ -45,7 +45,14 @@ extension on Duration{
 
 
 class _HomeScreenState extends State<HomeScreen> {
- 
+  
+  static const String circularProgressIndicatorKey =  "circularPI";
+  static const String lastUpdateKey =  "lastUpdate";
+  static const String albumsListKey =  "albumsList";
+  String albumIdKey(int id){
+    return "album$id";
+  }
+  
   AlbumsVM albumsVM = AlbumsVM(
     Input(
       BehaviorSubject<bool>(),
@@ -70,7 +77,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("My Albums"),
+        title: const Text("My Albums"), key: Key("title"),
       ),
       body: Center(
         child: GestureDetector(
@@ -79,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (ctx, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(),
+                    child: CircularProgressIndicator(key:Key(circularProgressIndicatorKey)),
                   );
                 } else {
                   if (snapshot.data != null) {
@@ -92,15 +99,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                     return Column(
                       children: [
-                        if (duration.inSeconds >= 5)
-                          Text("Results updated ${(duration.showLastUpdate)} ago"),
-                        if (duration.inSeconds < 5)
-                          const Text("Results updated just now"),
+                          Text("Results updated ${(duration.showLastUpdate)} ago", key:Key(lastUpdateKey)),
                         Expanded(
                           child: ListView.builder(
+                            key: Key(albumsListKey),
                             itemCount: albums.length,
                             itemBuilder: (ctx, index) {
                               return AlbumWidget(
+                                key: Key(albumIdKey(albums[index].id)),
                                 toggleFavorite: toggleFavorite,
                                 isFavorite: albums[index].favorite,
                                 name: albums[index].name,
