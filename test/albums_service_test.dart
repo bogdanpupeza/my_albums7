@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -28,6 +29,7 @@ void main() {
       return album.toJson();
     }
   ).toList());
+
 
   test("Test for getting albums", () {
     when(albumsService.client.get(Uri.parse(_url))).thenAnswer((_)=>Future.value(http.Response(jsonAlbums,200)));

@@ -9,8 +9,7 @@ import 'package:rxdart/subjects.dart';
 import 'albums_view_model_test.mocks.dart';
 
 @GenerateMocks([AlbumsRepository])
-void main(){
-  
+void main() {
   AlbumsVM albumsVM = AlbumsVM(
     Input(
       BehaviorSubject(),
@@ -18,49 +17,83 @@ void main(){
     ),
     MockAlbumsRepository(),
   );
-  
+
   DateTime date = DateTime.now();
   List<Album> albums = [];
-  for(int i = 1; i < 100; ++i){
-    albums.add(
-      Album(
-        id: i,
-        userId: i%50,
-        name: "$i",
-        favorite: false,
-      )
-    );
+  for (int i = 1; i < 100; ++i) {
+    albums.add(Album(
+      id: i,
+      userId: i % 50,
+      name: "$i",
+      favorite: false,
+    ));
   }
-  group("Tests for getting albums",(){
-    Stream resultStream = albumsVM.output.albumsDataStream.asBroadcastStream();
-    test("Test for getting albums with favorite status initial value", (){
-      when(albumsVM.albumsRepository.getAlbums()).thenAnswer((_) => Stream.value(AlbumsResponse(albums: albums, lastUpdate: date)));
-      when(albumsVM.albumsRepository.getFavorites()).thenAnswer((_) => Stream.value([]));
-      expect(
-        resultStream,
-        emits(isA<AlbumsResponse>().having((albumsResponse){
-          return albumsResponse.albums;
-        }, "Albums", albums).having((albumsResponse){
-          return albumsResponse.lastUpdate;
-        }, "Date", date)),
-      );
-      albumsVM.input.loadData.add(true);
-    });
+  Stream<AlbumsResponse> resultStream =
+      albumsVM.output.albumsDataStream.asBroadcastStream();
+  test("Test for getting albumsRespomse and an empty favorites list: albumsRepository.getAlbums(), albumsRepository.getFavorites()", () {
+    when(albumsVM.albumsRepository.getAlbums()).thenAnswer(
+        (_) => Stream.value(AlbumsResponse(albums: albums, lastUpdate: date)));
+    when(albumsVM.albumsRepository.getFavorites())
+        .thenAnswer((_) => Stream.value([]));
+    expect(
+      resultStream,
+      emits(isA<AlbumsResponse>().having((albumsResponse) {
+        return albumsResponse.albums;
+      }, "List of Albums", albums).having((albumsResponse) {
+        return albumsResponse.lastUpdate;
+      }, "Date of lastUpdate", date)),
+    );
+    albumsVM.input.loadData.add(true);
+  });
 
-    test("Test for getting albums with favorite status updated", (){
-      when(albumsVM.albumsRepository.getAlbums()).thenAnswer((_) => Stream.value(AlbumsResponse(albums: albums, lastUpdate: date)));
-      when(albumsVM.albumsRepository.getFavorites()).thenAnswer((_) => Stream.value([]));
-      when(albumsVM.albumsRepository.toggleAlbum(1)).thenAnswer((_) => Stream.value([1]));
-      expect(
+  test("Test for setting first album as favorite: albumsRepository.toggleAlbum(1): ", () {
+    when(albumsVM.albumsRepository.getAlbums()).thenAnswer(
+        (_) => Stream.value(AlbumsResponse(albums: albums, lastUpdate: date)));
+    when(albumsVM.albumsRepository.getFavorites())
+        .thenAnswer((_) => Stream.value([]));
+    when(albumsVM.albumsRepository.toggleAlbum(1))
+        .thenAnswer((_) => Stream.value([1]));
+    expect(
         resultStream,
-        emits(isA<AlbumsResponse>().having((albumsResponse){
-          return albumsResponse.albums;
-        }, "Albums", albums).having((albumsResponse){
-          return albumsResponse.lastUpdate;
-        }, "Date", date)),
-      );
-      albumsVM.input.loadData.add(true);
-      albumsVM.input.toggleFavorite.add(1);
-    });
+        emits(isA<AlbumsResponse>().having(
+            (albumsResponse) => albumsResponse.albums.first.favorite,
+            "first element has favorite = true",
+            true)));
+    albumsVM.input.loadData.add(true);
+    albumsVM.input.toggleFavorite.add(1);
+  });
+
+  test("Test for getting error: albumsRepository.getAlbums()", () {
+    when(albumsVM.albumsRepository.getAlbums())
+        .thenAnswer((_) => Stream.error(Error()));
+    expect(
+      resultStream,
+      emitsError(isA<Error>()),
+    );
+    albumsVM.input.loadData.add(true);
+  });
+
+  test("Test for getting error: albumsRepository.getFavorites()", () {
+    when(albumsVM.albumsRepository.getFavorites())
+        .thenAnswer((_) => Stream.error(Error()));
+    expect(
+      resultStream,
+      emitsError(isA<Error>()),
+    );
+    albumsVM.input.loadData.add(true);
+  });
+
+  test("Test for getting error: albumsRepository.toggleAlbum(albumId)", () {
+    when(albumsVM.albumsRepository.getAlbums()).thenAnswer(
+        (_) => Stream.value(AlbumsResponse(albums: albums, lastUpdate: date)));
+    when(albumsVM.albumsRepository.getFavorites())
+        .thenAnswer((_) => Stream.value([] as List<int>));
+    when(albumsVM.albumsRepository.toggleAlbum(1))
+        .thenAnswer((_) => Stream.error(Error()));
+    expect(
+      resultStream,
+      emitsError(isA<Error>()),
+    );
+    albumsVM.input.loadData.add(true);
   });
 }
