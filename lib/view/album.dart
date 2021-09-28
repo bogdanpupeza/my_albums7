@@ -1,12 +1,22 @@
 import 'package:flutter/material.dart';
 
 class AlbumWidget extends StatelessWidget {
+  final Key albumCircleAvatarKey = Key("albumCircleAvatar");
+  final Key albumTitleKey = Key("albumTitle");
+  final Key albumIdTextKey = Key("albumIdText");
+  final Key keyboardArrowIButtonKey = Key("keyboardArrowIButton");
+  final Key favoriteIButtonKey = Key("favoriteIButton");
+  final Key favoriteIconKey = Key("favorite");
+  final Key unfavoriteIconKey = Key("unfavorite");
+
+  final Key key;
   final Function(int) toggleFavorite;
   final bool? isFavorite;
   final String? name;
   final int id;
   final int? userId;
   AlbumWidget({
+    required this.key,
     required this.isFavorite,
     required this.name,
     required this.id,
@@ -27,6 +37,7 @@ class AlbumWidget extends StatelessWidget {
           margin: EdgeInsets.all(15),
           child: CircleAvatar(
             child: Icon(Icons.image_rounded),
+            key: albumCircleAvatarKey
           ),
         ),
         Expanded(
@@ -38,6 +49,7 @@ class AlbumWidget extends StatelessWidget {
               height: 40,
               child: Text(
                 name.toString(),
+                key: albumTitleKey,
                 overflow: TextOverflow.fade,
                 style: TextStyle(fontSize: 18),
               ),
@@ -47,22 +59,24 @@ class AlbumWidget extends StatelessWidget {
               alignment: Alignment.centerLeft,
               child: Text(
                 id.toString(),
+                key: albumIdTextKey,
                 style: TextStyle(fontSize: 12),
               ),
             ),
           ],
         )),
         IconButton(
+          key: keyboardArrowIButtonKey,
           icon: Icon(Icons.keyboard_arrow_right_outlined),
           onPressed: () {},
         ),
         IconButton(
+          key: favoriteIButtonKey,
           onPressed: () => toggleFavorite(id),
-          icon: isFavorite == null 
-              ? Icon(Icons.favorite_border)
-              : isFavorite == true
-              ? Icon(Icons.favorite)
-              : Icon(Icons.favorite_border),
+          icon: 
+              isFavorite == true
+              ? Icon(Icons.favorite, key: favoriteIconKey)
+              : Icon(Icons.favorite_border, key:unfavoriteIconKey),
         ),
       ]),
     );
